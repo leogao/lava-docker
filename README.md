@@ -8,7 +8,15 @@ To build an image locally, execute the following from the directory you cloned t
 sudo docker build -t lava .
 ```
 
-## Running
+## Running the self built timage
+To run the image from a host terminal / command line execute the following:
+
+```
+sudo docker run -it -v /dev:/dev -p 69:69/udp -p 80:80 -p 5555:5555 -p 5556:5556 -h <HOSTNAME> --privileged lava:latest
+```
+Where HOSTNAME is the hostname used during the container build process (check the docker build log), as that is the name used for the worker configuration. You can use `lava-docker` as the pre-built container hostname.
+
+## Running the prebuilt image
 To run the image from a host terminal / command line execute the following:
 
 ```
@@ -20,7 +28,7 @@ Where HOSTNAME is the hostname used during the container build process (check th
 Enviroment variables are available to help setup state within the container.
 
 ```
-sudo docker run -it -v /dev:/dev -p 69:69/udp -p 80:80 -p 5555:5555 -p 5556:5556 -e LAVA_API_TOKEN='<token>' -h <HOSTNAME> --privileged kernelci/lava-docker-v2:latest
+sudo docker run -it -v /dev:/dev -p 69:69/udp -p 80:80 -p 5555:5555 -p 5556:5556 -e LAVA_API_TOKEN='<token>' -e LAVA_SERVER_IP='<docker host ip>' -h <HOSTNAME> --privileged kernelci/lava-docker-v2:latest
 ```
 Where LAVA_SERVER_IP is the IP of your Docker host. This allows the TFTP service to properly address the TFTP transfers.
 
