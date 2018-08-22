@@ -1,0 +1,6 @@
+pek-rhfs1:/pek-rhfs05/share/vlm                 /folk/vlm                            nfs  rw,hard,intr,noexec 0 0
+pek-tuxlab.wrs.com:/export/pxeboot/vlm-boards   /mnt/pek                             nfs  rw,hard,intr,noexec 0 0
+pek-tuxlab2.wrs.com:/export/pxeboot/vlm-boards  /mnt/pek2                            nfs  rw,hard,intr,noexec 0 0
+yow-tuxlab2.wrs.com:/export/pxeboot/vlm-boards  /mnt/yow                             nfs  rw,hard,intr,noexec 0 0
+pek-lpgtest21.wrs.com:/buildarea1/lava          /var/www/lava                        nfs  rw,hard,intr,noexec 0 0
+pek-lpgtest16.wrs.com:/buildarea1/debug         /var/www/lava/debug                  nfs  rw,hard,intr,noexec 0 0
