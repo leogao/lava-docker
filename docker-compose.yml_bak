@@ -1,10 +1,20 @@
 services:
+  lava-master:
+    build: {context: lava-master}
+    hostname: lava-master
+    ports: ['10080:80', '18080:8080','5555:5555', '5556:5556']
+    restart: always
+    stdin_open: true
+    tty: true
+    #volumes: ['/boot:/boot', '/lib/modules:/lib/modules',]
+    volumes: ['/boot:/boot', '/lib/modules:/lib/modules', '/mnt/gluster/lava-postgresql:/var/lib/postgresql']
+    privileged: true
   lava-slave:
     build: {context: lava-slave}
     dns_search: ''
     environment: {LAVA_MASTER: lava-master}
     hostname: lab-slave-0
-    #links: [lava-master]
+    links: [lava-master]
     ports: ['69:69/udp', '80:80', '61950-62000:61950-62000']
     restart: always
     volumes: ['/boot:/boot', '/lib/modules:/lib/modules']
