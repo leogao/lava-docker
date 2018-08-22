@@ -1,8 +1,8 @@
 FROM lavadocker_lava-master:latest 
 
 COPY scripts/lava-extra.conf /etc/apache2/sites-available/
-COPY scripts/ports.conf /etc/apache2/
-COPY scripts/fstab      /etc/fstab
+COPY scripts/ports.conf      /etc/apache2/
+COPY scripts/fstab           /etc/fstab
 
 # Run start.sh as rc.local
 COPY scripts/start.sh   /etc/rc.local
@@ -10,10 +10,12 @@ COPY scripts/rc.local   /etc/init.d/rc.local
 RUN cd /etc/rc5.d/ && ln -s ../init.d/rc.local S06rc.local 
 
 # Clone lava-extra and patch code. 
-RUN git clone git://git.wrs.com/git/lava-extra /opt/lava-extra
+RUN git clone git://git.wrs.com/git/lava-extra /opt/lava-extra && \
+ cd /opt/lava-extra && git pull
 
 # Clone lava-test-definitions
-RUN git clone git://git.wrs.com/git/lava-test-definitions
+RUN git clone git://git.wrs.com/git/lava-test-definitions /opt/lava-test-definitions && \
+ cd /opt/lava-test-definitions && git pull
 
 RUN \
  echo 'lava-server : setting apache2' && \
@@ -25,6 +27,10 @@ RUN \
 
 #uncomment if you want to use squid
 RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
+
+# Caution to not use any port between the Linux dynamic port range: 32768-60999
+RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python3/dist-packages/lava_common/constants.py
+RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python3/dist-packages/lava_common/constants.py
 
 #comment this if you do HTTPS (For reenabling CSRF cookie)
 COPY settings.conf /etc/lava-server/

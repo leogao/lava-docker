@@ -25,6 +25,10 @@ RUN \
  gnupg \
  iputils-ping \
  sshpass \
+ python-paramiko \
+ python3-paramiko \
+ lib32ncurses5 \
+ lib32z1 \
  vim || \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
@@ -36,6 +40,10 @@ RUN \
  gnupg \
  iputils-ping \
  sshpass \
+ python-paramiko \
+ python3-paramiko \
+ lib32ncurses5 \
+ lib32z1 \
  vim 
 
 RUN \
