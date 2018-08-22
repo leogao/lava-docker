@@ -5,13 +5,13 @@ start_service () {
 	if (( $(ps -ef | grep -v grep | grep -v add_device | grep -v dispatcher-config | grep "$1" | wc -l) > 0 ))
 	then
 		echo "$1 appears to be running"
-		else
+	else
 		systemctl start "$1"
 	fi
 }
 
 
-main () {
+main() {
 	echo "Waiting for lavaserver database to be active"
 	while (( $(ps -ef | grep -v grep | grep postgres | grep lavaserver | wc -l) == 0 ))
 	do
@@ -33,5 +33,6 @@ main () {
 rm -f /var/run/lava-*.pid 2> /dev/null
 
 main
+cd /opt/lava-extra/additions && bash setup_lava.sh
 #added after the website not running a few times on boot
 systemctl reload apache2 
