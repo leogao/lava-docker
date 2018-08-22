@@ -1,0 +1,27 @@
+FROM lavadocker_lava-slave:latest 
+
+COPY scripts/fstab /etc/fstab
+
+# Run start.sh as rc.local
+COPY scripts/start.sh /etc/rc.local
+COPY scripts/rc.local /etc/init.d/rc.local
+RUN cd /etc/rc5.d/ && ln -s ../init.d/rc.local S06rc.local 
+
+# Clone lava-extra and patch code. 
+RUN git clone git://git.wrs.com/git/lava-extra /opt/lava-extra && \
+ cd /opt/lava-extra && git pull
+
+# Clone lava-test-definitions
+RUN git clone git://git.wrs.com/git/lava-test-definitions /opt/lava-test-definitions && \
+ cd /opt/lava-test-definitions && git pull
+
+COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
+COPY configs/tftpd-hpa /etc/default/tftpd-hpa
+
+# Caution to not use any port between the Linux dynamic port range: 32768-60999
+RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python3/dist-packages/lava_common/constants.py
+RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python3/dist-packages/lava_common/constants.py
+
+EXPOSE 69/udp 80
+
+CMD ["/sbin/init"]

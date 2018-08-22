@@ -1,0 +1,81 @@
+FROM pek-lava.wrs.com/ubuntu:latest 
+
+RUN apt-get clean
+RUN apt-get update
+
+# Add services helper utilities to start and stop LAVA
+COPY scripts/stop.sh .
+COPY scripts/start.sh .
+
+# Install debian packages used by the container
+# Configure apache to run the lava server
+# Log the hostname used during install for the slave name
+# e2fsprogs is for libguestfs
+RUN \
+ echo 'lava-server   lava-server/instance-name string lava-slave-instance' | debconf-set-selections && \
+ echo 'locales locales/locales_to_be_generated multiselect C.UTF-8 UTF-8, en_US.UTF-8 UTF-8 ' | debconf-set-selections && \
+ echo 'locales locales/default_environment_locale select en_US.UTF-8' | debconf-set-selections && \
+ DEBIAN_FRONTEND=noninteractive apt-get -y install \
+ locales \
+ wget \
+ git \
+ vim \
+ sudo \
+ python-setproctitle \
+ tftpd-hpa \
+ u-boot-tools \
+ iputils-ping \
+ device-tree-compiler \
+ qemu-system \
+ qemu-system-arm \
+ qemu-system-i386 \
+ qemu-kvm \
+ xnbd-server \
+ sshpass \
+ python-paramiko \
+ python3-paramiko \
+ lib32ncurses5 \
+ lib32z1 \
+ e2fsprogs || \
+ DEBIAN_FRONTEND=noninteractive apt-get -y install \
+ locales \
+ wget \
+ git \
+ vim \
+ sudo \
+ python-setproctitle \
+ tftpd-hpa \
+ u-boot-tools \
+ iputils-ping \
+ device-tree-compiler \
+ qemu-system \
+ qemu-system-arm \
+ qemu-system-i386 \
+ qemu-kvm \
+ xnbd-server \
+ sshpass \
+ python-paramiko \
+ python3-paramiko \
+ lib32ncurses5 \
+ lib32z1 \
+ e2fsprogs
+
+RUN \
+ wget http://images.validation.linaro.org/production-repo/production-repo.key.asc && \
+ apt-key add production-repo.key.asc && \
+ echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list && \
+ apt-get clean && apt-get update
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher || \
+ DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
+
+COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
+COPY configs/tftpd-hpa /etc/default/tftpd-hpa
+
+# Caution to not use any port between the Linux dynamic port range: 32768-60999
+RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python3/dist-packages/lava_common/constants.py
+RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python3/dist-packages/lava_common/constants.py
+
+EXPOSE 69/udp 80
+
+CMD ["/sbin/init"]
