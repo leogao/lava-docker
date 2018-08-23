@@ -27,4 +27,4 @@ main() {
 
 main
 # start an http file server for boot/transfer_overlay support
-(cd /var/lib/lava/dispatcher; python -m SimpleHTTPServer 80)
+(cd /var/lib/lava/dispatcher; python -m SimpleHTTPServer 80 &)
