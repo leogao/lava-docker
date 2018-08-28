@@ -1,4 +1,4 @@
-pek-rhfs1:/pek-rhfs05/share/vlm                 /folk/vlm                            nfs  rw,hard,intr,noexec 0 0
+pek-rhfs1.wrs.com:/pek-rhfs05/share/vlm         /folk/vlm                            nfs  rw,hard,intr,noexec 0 0
 pek-tuxlab.wrs.com:/export/pxeboot/vlm-boards   /mnt/pek                             nfs  rw,hard,intr,noexec 0 0
 pek-tuxlab2.wrs.com:/export/pxeboot/vlm-boards  /mnt/pek2                            nfs  rw,hard,intr,noexec 0 0
 yow-tuxlab2.wrs.com:/export/pxeboot/vlm-boards  /mnt/yow                             nfs  rw,hard,intr,noexec 0 0
