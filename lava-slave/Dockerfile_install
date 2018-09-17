@@ -32,8 +32,11 @@ RUN \
  qemu-kvm \
  xnbd-server \
  sshpass \
+ gnupg \
  python-paramiko \
  python3-paramiko \
+ python-psutil \
+ python3-psutil \
  lib32ncurses5 \
  lib32z1 \
  e2fsprogs || \
@@ -54,8 +57,11 @@ RUN \
  qemu-kvm \
  xnbd-server \
  sshpass \
+ gnupg \
  python-paramiko \
  python3-paramiko \
+ python-psutil \
+ python3-psutil \
  lib32ncurses5 \
  lib32z1 \
  e2fsprogs

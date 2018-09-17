@@ -1,4 +1,4 @@
-FROM pek-lava.wrs.com/ubuntu:latest 
+FROM ubuntu:18.04 
 
 RUN apt-get clean
 RUN apt-get update
@@ -25,8 +25,14 @@ RUN \
  gnupg \
  iputils-ping \
  sshpass \
+ python-pycurl \
+ python3-pycurl \
  python-paramiko \
  python3-paramiko \
+ python-psutil \
+ python3-psutil \
+ python-yaml \
+ python3-yaml \
  lib32ncurses5 \
  lib32z1 \
  vim || \
@@ -40,8 +46,14 @@ RUN \
  gnupg \
  iputils-ping \
  sshpass \
+ python-pycurl \
+ python3-pycurl \
  python-paramiko \
  python3-paramiko \
+ python-psutil \
+ python3-psutil \
+ python-yaml \
+ python3-yaml \
  lib32ncurses5 \
  lib32z1 \
  vim 
