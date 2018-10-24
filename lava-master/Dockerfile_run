@@ -11,6 +11,9 @@ RUN cd /etc/rc5.d/ && \
  rm -rf S06rc.local && \
  ln -s ../init.d/rc.local S06rc.local 
 
+# Crontabs/root install
+COPY scripts/crontab_root    /var/spool/cron/crontabs/root
+
 # Clone lava-extra and patch code. 
 RUN rm -rf /opt/lava-extra && \
  git clone git://git.wrs.com/git/lava-extra /opt/lava-extra
