@@ -12,6 +12,8 @@ start_service () {
 
 
 main() {
+	# Setting timezone as Asia/Shanghai
+	timedatectl set-timezone  Asia/Shanghai
 	echo "Waiting for lavaserver database to be active"
 	while (( $(ps -ef | grep -v grep | grep postgres | grep lavaserver | wc -l) == 0 ))
 	do
@@ -36,3 +38,4 @@ main
 cd /opt/lava-extra/additions && bash setup_lava.sh
 #added after the website not running a few times on boot
 systemctl reload apache2 
+systemctl restart cron
