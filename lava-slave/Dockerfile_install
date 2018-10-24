@@ -3,10 +3,6 @@ FROM pek-lava.wrs.com/ubuntu:latest
 RUN apt-get clean
 RUN apt-get update
 
-# Add services helper utilities to start and stop LAVA
-COPY scripts/stop.sh .
-COPY scripts/start.sh .
-
 # Install debian packages used by the container
 # Configure apache to run the lava server
 # Log the hostname used during install for the slave name
@@ -33,6 +29,7 @@ RUN \
  xnbd-server \
  sshpass \
  gnupg \
+ cron \
  python-paramiko \
  python3-paramiko \
  python-psutil \
@@ -58,6 +55,7 @@ RUN \
  xnbd-server \
  sshpass \
  gnupg \
+ cron \
  python-paramiko \
  python3-paramiko \
  python-psutil \
@@ -72,8 +70,14 @@ RUN \
  echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list && \
  apt-get clean && apt-get update
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher || \
- DEBIAN_FRONTEND=noninteractive apt-get -y install lava-dispatcher
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
+ lava-dispatcher \
+ lava-coordinator \
+ apache2 || \
+ DEBIAN_FRONTEND=noninteractive apt-get -y install \
+ lava-dispatcher \
+ lava-coordinator \
+ apache2
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
