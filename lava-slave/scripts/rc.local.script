@@ -1,0 +1,40 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+#Setup addition lava codes
+#Restart lava-slave and lava-coordinator
+setup_and_restart() {
+	loop=10
+	while (( $(ps -ef | grep -v grep | grep lava-slave | wc -l) == 0 ))
+	do
+		echo "Waiting for lava-slave to be active"
+		systemctl restart tftpd-hpa
+		# FIXME lava-slave does not run if old pid is present
+		rm -f /var/run/lava-slave.pid
+		systemctl restart lava-slave
+		systemctl restart lava-coordinator
+		if [[ $loop -le 0 ]]; then
+			echo "Failed to start lava-slave"
+			break
+		else
+			loop=$((loop-1))
+		fi
+		sleep 3
+	done
+	cd /opt/lava-extra/additions && bash setup_lava.sh
+	systemctl restart lava-slave || exit 5
+	systemctl restart lava-coordinator || exit 5
+}
+
+setup_and_restart
+exit 0
