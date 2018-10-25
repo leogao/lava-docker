@@ -34,6 +34,9 @@ setup_and_restart() {
 	cd /opt/lava-extra/additions && bash setup_lava.sh
 	systemctl restart lava-slave || exit 5
 	systemctl restart lava-coordinator || exit 5
+	systemctl restart apache2 
+	systemctl reload  apache2 
+	systemctl restart cron
 }
 
 setup_and_restart

@@ -1,21 +1,21 @@
-FROM lavadocker_lava-slave:latest 
+FROM pek-lava.wrs.com/lava-slave:2018.09.30
 
+# Init fstab, auto mount
 COPY scripts/fstab /etc/fstab
 
-# Run start.sh as rc.local
-COPY scripts/start.sh /etc/rc.local
-COPY scripts/rc.local /etc/init.d/rc.local
+# Run lava-extra.sh as rc.local
+COPY scripts/rc.local.script  /etc/rc.local
+COPY scripts/rc.local.service /etc/init.d/rc.local
 RUN cd /etc/rc5.d/ && \
  rm -rf S06rc.local && \
  ln -s ../init.d/rc.local S06rc.local 
 
+# Crontabs/root install
+COPY scripts/crontab_root /var/spool/cron/crontabs/root
+
 # Clone lava-extra and patch code. 
 RUN rm -rf /opt/lava-extra && \
  git clone git://git.wrs.com/git/lava-extra /opt/lava-extra
-
-# Clone lava-test-definitions
-RUN rm -rf /opt/lava-test-definitions && \
- git clone git://git.wrs.com/git/lava-test-definitions /opt/lava-test-definitions
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
 COPY configs/tftpd-hpa /etc/default/tftpd-hpa
@@ -24,9 +24,19 @@ COPY configs/tftpd-hpa /etc/default/tftpd-hpa
 RUN sed -i 's,XNBD_PORT_RANGE_MIN.*,XNBD_PORT_RANGE_MIN=61950,' /usr/lib/python3/dist-packages/lava_common/constants.py
 RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python3/dist-packages/lava_common/constants.py
 
-# Set lava-master while dispatcher lava-slave
-RUN sed -i -e "s/{LAVA_MASTER}/lava-master/g" /etc/lava-dispatcher/lava-slave
+# Setting apache2 for lava-slave, while it's run just as worker.
+COPY scripts/lava-slave.conf /etc/apache2/sites-available/
+RUN \
+ echo 'lava-slave : setting apache2' && \
+ a2enmod proxy && \
+ a2enmod proxy_http && \
+ a2dissite 000-default && \
+ a2ensite lava-slave.conf
+
+# Set LAVA_MASTER IP and /sbin/init
+COPY scripts/start.sh /sbin/start.sh
+RUN chmod +x /sbin/start.sh
 
 EXPOSE 69/udp 80
 
-CMD ["/sbin/init"]
+CMD ["/sbin/start.sh"]
