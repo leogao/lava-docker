@@ -3,10 +3,12 @@ FROM pek-lava.wrs.com/lava-slave:2018.09.30
 # Init fstab, auto mount
 COPY scripts/fstab /etc/fstab
 
-# Run lava-extra.sh as rc.local
+# Setup lava environment in rc.local
 COPY scripts/rc.local.script  /etc/rc.local
 COPY scripts/rc.local.service /etc/init.d/rc.local
 RUN cd /etc/rc5.d/ && \
+ chmod +x /etc/rc.local && \
+ chmod +x /etc/init.d/rc.local && \
  rm -rf S06rc.local && \
  ln -s ../init.d/rc.local S06rc.local 
 

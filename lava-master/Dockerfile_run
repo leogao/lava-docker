@@ -1,13 +1,14 @@
-FROM lavadocker_lava-master:latest 
+FROM pek-lava.wrs.com/lava-master:2018.09.07
 
-COPY scripts/lava-extra.conf /etc/apache2/sites-available/
-COPY scripts/ports.conf      /etc/apache2/
+# Init fstab, auto mount
 COPY scripts/fstab           /etc/fstab
 
-# Run start.sh as rc.local
-COPY scripts/start.sh   /etc/rc.local
-COPY scripts/rc.local   /etc/init.d/rc.local
+# Setup lava environment in rc.local
+COPY scripts/rc.local.script  /etc/rc.local
+COPY scripts/rc.local.service /etc/init.d/rc.local
 RUN cd /etc/rc5.d/ && \
+ chmod +x /etc/rc.local && \
+ chmod +x /etc/init.d/rc.local && \
  rm -rf S06rc.local && \
  ln -s ../init.d/rc.local S06rc.local 
 
@@ -22,6 +23,9 @@ RUN rm -rf /opt/lava-extra && \
 RUN rm -rf /opt/lava-test-definitions && \
  git clone git://git.wrs.com/git/lava-test-definitions /opt/lava-test-definitions
 
+# Setting apache2.
+COPY scripts/lava-extra.conf /etc/apache2/sites-available/
+COPY scripts/ports.conf      /etc/apache2/
 RUN \
  echo 'lava-server : setting apache2' && \
  a2enmod proxy && \
