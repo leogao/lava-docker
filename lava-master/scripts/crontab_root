@@ -26,4 +26,5 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
 */2 * * * *  cd /opt/lava-extra/bin; mkdir -p /tmp/lava; ./update_lava_status.py 
+30 0 * * *  systemctl restart lava-coordinator
 */30 * * * *  systemctl restart lava-slave 
