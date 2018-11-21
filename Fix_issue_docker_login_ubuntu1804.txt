@@ -1,0 +1,29 @@
+1) install devdockerCA.crt
+# cp devdockerCA.crt /usr/local/share/ca-certificates/docker-dev-cert/devdockerCA.crt
+# update-ca-certificates
+# systemctl  restart  docker
+
+2) install docker-credential-pass
+# wget https://github.com/docker/docker-credential-helpers/releases/download/v0.6.0/docker-credential-pass-v0.6.0-amd64.tar.gz
+# tar xf docker-credential-pass-v0.6.0-amd64.tar.gz
+# cp docker-credential-pass /usr/sbin/
+
+3) install rng-tools, gpg and pass
+# apt-get install rng-tools gpg pass
+# gpg-agent --daemon
+
+3) generate-key and init.
+# mkdir  ~/.docker
+# cat ~/.docker/config.json
+{
+        "credsStore": "pass"
+}
+# gpg --generate-key
+# pass init 0C0EEED4CDF34A92213313CB95A2AA81CFDB3A36
+# pass insert docker-credential-helpers/docker-pass-initialized-check
+# pass show docker-credential-helpers/docker-pass-initialized-check
+# docker-credential-pass list
+# cat  ~/.docker/config.json
+
+4) login docker-registry
+# docker login pek-lava.wrs.com
