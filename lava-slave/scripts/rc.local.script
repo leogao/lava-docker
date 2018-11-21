@@ -14,6 +14,7 @@
 #Setup addition lava codes
 #Restart lava-slave and lava-coordinator
 setup_and_restart() {
+	timedatectl set-timezone  Asia/Shanghai
 	loop=10
 	while (( $(ps -ef | grep -v grep | grep lava-slave | wc -l) == 0 ))
 	do
