@@ -25,4 +25,6 @@
 # m h  dom mon dow   command
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
-*/30 * * * *  systemctl restart lava-extra
+30 0 * * *  systemctl restart lava-coordinator
+*/20 * * * *  systemctl restart lava-slave
+*/20 * * * *  systemctl restart apache2
