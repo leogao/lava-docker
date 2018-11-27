@@ -1,0 +1,9 @@
+[Unit]
+Description=Lava Device Update
+
+[Service]
+ExecStart=/bin/bash -c "exec /opt/lava-extra/bin/devices_status_update.sh"
+
+[Install]
+WantedBy=multi-user.target
+

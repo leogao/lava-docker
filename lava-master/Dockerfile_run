@@ -34,6 +34,9 @@ RUN \
  a2ensite lava-server.conf && \
  a2ensite lava-extra.conf
 
+# Install lava-device-update.service
+COPY scripts/lava-device-update.service /lib/systemd/system/
+
 #uncomment if you want to use squid
 RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
 
