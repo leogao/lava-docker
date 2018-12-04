@@ -1,4 +1,4 @@
-FROM pek-lava.wrs.com/lava-slave:2018.09.30
+FROM pek-lava.wrs.com/lava-slave:2018.10.25
 
 # Init fstab, auto mount
 COPY scripts/fstab /etc/fstab
@@ -28,12 +28,16 @@ RUN sed -i 's,XNBD_PORT_RANGE_MAX.*,XNBD_PORT_RANGE_MAX=62000,' /usr/lib/python3
 
 # Setting apache2 for lava-slave, while it's run just as worker.
 COPY scripts/lava-slave.conf /etc/apache2/sites-available/
+COPY scripts/lava-extra.conf /etc/apache2/sites-available/
+COPY scripts/ports.conf /etc/apache2/
+
 RUN \
  echo 'lava-slave : setting apache2' && \
  a2enmod proxy && \
  a2enmod proxy_http && \
  a2dissite 000-default && \
- a2ensite lava-slave.conf
+ a2ensite lava-slave.conf && \
+ a2ensite lava-extra.conf
 
 # Set LAVA_MASTER IP and /sbin/init
 COPY scripts/start.sh /sbin/start.sh
