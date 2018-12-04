@@ -47,8 +47,12 @@ setup_and_restart () {
 	systemctl restart lava-master
 	systemctl restart lava-slave
 	systemctl reload apache2 
+	systemctl enable lava-device-update
+	systemctl start lava-device-update
 }
 
+#set timezone as Shanghai
+timedatectl set-timezone  Asia/Shanghai
 #remove lava-pid files incase the image is stored without first stopping the services
 setup_and_restart
 exit 0
