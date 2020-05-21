@@ -1,7 +1,8 @@
-FROM ubuntu:18.04 
+FROM ubuntu:20.04 
 
-RUN apt-get clean
-RUN apt-get update
+RUN \
+ apt-get clean && \
+ apt-get update
 
 # Install debian packages used by the container
 # Configure apache to run the lava server
@@ -21,16 +22,10 @@ RUN \
  gnupg \
  iputils-ping \
  sshpass \
- python-pycurl \
  python3-pycurl \
- python-paramiko \
  python3-paramiko \
- python-psutil \
  python3-psutil \
- python-yaml \
  python3-yaml \
- lib32ncurses5 \
- lib32z1 \
  vim || \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
@@ -42,22 +37,16 @@ RUN \
  gnupg \
  iputils-ping \
  sshpass \
- python-pycurl \
  python3-pycurl \
- python-paramiko \
  python3-paramiko \
- python-psutil \
  python3-psutil \
- python-yaml \
  python3-yaml \
- lib32ncurses5 \
- lib32z1 \
  vim 
 
 RUN \
- wget http://images.validation.linaro.org/production-repo/production-repo.key.asc && \
- apt-key add production-repo.key.asc && \
- echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list && \
+ wget https://apt.lavasoftware.org/lavasoftware.key.asc && \
+ apt-key add lavasoftware.key.asc && \
+ echo 'deb https://apt.lavasoftware.org/daily buster main' > /etc/apt/sources.list.d/lava.list && \
  apt-get clean && apt-get update
 
 RUN \
@@ -70,7 +59,12 @@ RUN \
  qemu-system-arm \
  qemu-system-i386 \
  python-setproctitle \
- lava-server || \
+ lava-server \
+ lava-common \
+ lava-coordinator \
+ lava-dispatcher \
+ lava-server-doc \
+ lavacli || \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  ser2net \
  u-boot-tools \
@@ -79,18 +73,41 @@ RUN \
  qemu-system-arm \
  qemu-system-i386 \
  python-setproctitle \
- lava-server 
+ lava-common \
+ lava-coordinator \
+ lava-dispatcher \
+ lava-server-doc \
+ lavacli
 
-COPY scripts/lava-extra.conf /etc/apache2/sites-available/
-COPY scripts/ports.conf /etc/apache2/
+#Install docs html
+RUN \
+ DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
+ python3-sphinx \
+ python3-sphinx-bootstrap-theme \
+ git \
+ make || \
+ DEBIAN_FRONTEND=noninteractive apt-get -y --no-install-recommends install \
+ python3-sphinx \
+ python3-sphinx-bootstrap-theme \
+ git \
+ make
+
+RUN mkdir -p /app/lava_common /app/doc
+COPY ./lava_common/version.py /app/lava_common/version.py
+COPY ./lava_common/VERSION /app/lava_common/VERSION
+COPY ./doc/v2 /app/doc/v2
+RUN sed -i 's@https@http@g' /app/doc/v2/conf.py && \
+ make -C /app/doc/v2 html && \
+ cp -R  /app/doc/v2/_build/html/* /usr/share/lava-server/static/docs/v2/ && \
+ rm -rf /app && \
+ find /usr/lib/python3/dist-packages/ -name '__pycache__' -type d -exec rm -r "{}" +
 
 RUN \
  echo 'lava-server : setting apache2' && \
  a2enmod proxy && \
  a2enmod proxy_http && \
  a2dissite 000-default && \
- a2ensite lava-server.conf && \
- a2ensite lava-extra.conf
+ a2ensite lava-server.conf
 
 #uncomment if you want to use squid
 RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-server/env.yaml
@@ -98,6 +115,6 @@ RUN sed -i 's,^.*http_proxy:.*,  http_proxy: http://squid:3128,' /etc/lava-serve
 #comment this if you do HTTPS (For reenabling CSRF cookie)
 COPY settings.conf /etc/lava-server/
 
-EXPOSE 69/udp 80 3079 5555 5556
+EXPOSE 69/udp 80 3079 5500 5555 5556
 
 CMD ["/sbin/init"]
