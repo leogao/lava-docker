@@ -2,7 +2,7 @@
 Description=Lava Device Update
 
 [Service]
-ExecStart=/bin/bash -c "exec /opt/lava-extra/bin/devices_status_update.sh"
+ExecStart=/bin/bash -c "python3 /opt/lava-extra/bin/update_lava_status.py"
 
 [Install]
 WantedBy=multi-user.target
