@@ -1,7 +1,8 @@
-FROM pek-lava.wrs.com/ubuntu:latest 
+FROM ubuntu:20.04 
 
-RUN apt-get clean
-RUN apt-get update
+RUN \
+ apt-get clean && \
+ apt-get update
 
 # Install debian packages used by the container
 # Configure apache to run the lava server
@@ -26,16 +27,11 @@ RUN \
  qemu-system-arm \
  qemu-system-i386 \
  qemu-kvm \
- xnbd-server \
  sshpass \
  gnupg \
  cron \
- python-paramiko \
  python3-paramiko \
- python-psutil \
  python3-psutil \
- lib32ncurses5 \
- lib32z1 \
  e2fsprogs || \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  locales \
@@ -52,31 +48,24 @@ RUN \
  qemu-system-arm \
  qemu-system-i386 \
  qemu-kvm \
- xnbd-server \
  sshpass \
  gnupg \
  cron \
- python-paramiko \
  python3-paramiko \
- python-psutil \
  python3-psutil \
- lib32ncurses5 \
- lib32z1 \
  e2fsprogs
 
 RUN \
- wget http://images.validation.linaro.org/production-repo/production-repo.key.asc && \
- apt-key add production-repo.key.asc && \
- echo 'deb http://images.validation.linaro.org/production-repo/ stretch-backports main' > /etc/apt/sources.list.d/lava.list && \
+ wget https://apt.lavasoftware.org/lavasoftware.key.asc && \
+ apt-key add lavasoftware.key.asc && \
+ echo 'deb https://apt.lavasoftware.org/daily buster main' > /etc/apt/sources.list.d/lava.list && \
  apt-get clean && apt-get update
 
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
  lava-dispatcher \
- lava-coordinator \
  apache2 || \
  DEBIAN_FRONTEND=noninteractive apt-get -y install \
  lava-dispatcher \
- lava-coordinator \
  apache2
 
 COPY configs/lava-slave /etc/lava-dispatcher/lava-slave
